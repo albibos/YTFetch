@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>YTFetch</title>
+  <link rel="stylesheet" href="https://cdn.plyr.io/3.6.2/plyr.css" />
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cabin:wght@500&family=Montserrat:wght@600&family=Noto+Sans:wght@600&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #282828;
+            color: white;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        h1 {
+          font-family: 'Noto Sans', sans-serif;
+          font-size: 70px;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        input[type="text"] {
+            width: 70%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            box-sizing: border-box;
+            border: 2px solid ##FF0000;
+            border-radius: 4px;
+            text-align: center;
+            font-family: 'Cabin', sans-serif;
+        }
+        button {
+            width: 30%;
+            background-color: #FF0000;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Cabin', sans-serif;
+            font-size: 15px;
+        }
+        button:hover {
+            background-color: #ad0000;
+        }
+
+        a {
+            width: 30%;
+            background-color: #FF0000;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: center;
+            font-family: 'Cabin', sans-serif;
+        }
+        a:hover {
+            background-color: #ad0000;
+        }
+
+        a:link { text-decoration: none; }
+
+
+        a:visited { text-decoration: none; }
+
+
+        a:hover { text-decoration: none; }
+
+
+        a:active { text-decoration: none; }
+      
+        .plyr {
+            width: 1300px;
+            height: 600px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>YTFetch</h1>
+        <input type="text" id="urlInput" placeholder="Enter YouTube Video URL">
+        <button onclick="fetchVideo()">Fetch Video</button>
+        <h2 id="videoTitle"></h2>
+        <h3 id="videoAuthor"></h3>
+        <video id="player" controls></video>
+        <a id="downloadLink">Download Video</a>
+    </div>
+
+    <script src="https://cdn.plyr.io/3.6.2/plyr.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const player = new Plyr('#player');
+        const socket = io();
+        
+        function fetchVideo() {
+            const url = document.getElementById('urlInput').value;
+            socket.emit('fetchVideo', url);
+        }
+
+        socket.on('videoInfo', (info) => {
+            document.getElementById('videoTitle').textContent = info.title;
+            document.getElementById('videoAuthor').textContent = info.author.name;
+
+            player.source = {
+                type: 'video',
+                sources: [
+                    {
+                        src: info.videoUrl,
+                        type: 'video/mp4',
+                    },
+                ],
+            };
+          document.getElementById('downloadLink').href = info.videoUrl;
+        });
+    </script>
+</body>
+</html>
